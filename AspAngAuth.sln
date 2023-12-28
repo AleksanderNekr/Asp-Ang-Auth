@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Together", "Together", "{86213244-CBF5-4891-B05C-744FECBDB660}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneDomain", "OneDomain\OneDomain.csproj", "{FFA1853F-E8C1-4435-BDE4-1555B7AFA274}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FFA1853F-E8C1-4435-BDE4-1555B7AFA274} = {86213244-CBF5-4891-B05C-744FECBDB660}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FFA1853F-E8C1-4435-BDE4-1555B7AFA274}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFA1853F-E8C1-4435-BDE4-1555B7AFA274}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFA1853F-E8C1-4435-BDE4-1555B7AFA274}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFA1853F-E8C1-4435-BDE4-1555B7AFA274}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
