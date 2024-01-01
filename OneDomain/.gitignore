@@ -227,3 +227,6 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
+
+/app.db-shm
+/app.db-wal
