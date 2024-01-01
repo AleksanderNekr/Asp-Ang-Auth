@@ -1,0 +1,33 @@
+@if (messages.length > 0) {
+<div>
+@for (message of messages; track $index) {
+@if (message.user === user) {
+<p style="font-weight: bold; text-align: end;">{{ message.user }}</p>
+<p style="margin-top: 0; text-align: end;">{{ message.text }}</p>
+} @else {
+<p style="font-weight: bold;">{{ message.user }}</p>
+<p style="margin-top: 0;">{{ message.text }}</p>
+}
+}
+</div>
+} @else {
+<p>No messages yet...</p>
+}
+
+@if (user!.length === 0) {
+<p>Send a message!</p>
+<form [formGroup]="inputNameForm" (ngSubmit)="saveUser()">
+<label for="user" style="font-weight: bold;">
+Input your name: <input id="user" type="text" formControlName="user">
+</label>
+<input type="submit" [disabled]="!inputNameForm.valid">
+</form>
+} @else {
+<p>Send a message, {{ user }}!</p>
+<form [formGroup]="sendMessageForm" (ngSubmit)="sendMessage()">
+<label for="text" style="font-weight: bold;">
+Message: <input id="text" type="text" formControlName="text">
+</label>
+<input type="submit" [disabled]="!sendMessageForm.valid">
+</form>
+}
