@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using OneDomain.Data;
 using OneDomain.Models;
@@ -7,22 +8,25 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                          ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                                                        options.UseSqlite(connectionString));
+    options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-       .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddIdentityServer()
-       .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+    .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
 builder.Services.AddAuthentication()
-       .AddIdentityServerJwt();
+    .AddIdentityServerJwt();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddSignalR();
+builder.Services.AddCors();
 
 WebApplication app = builder.Build();
 
@@ -52,4 +56,22 @@ app.MapRazorPages();
 
 app.MapFallbackToFile("index.html");
 
+app.MapHub<ChatHub>("/chat");
+
+app.UseCors(policyBuilder =>
+{
+    policyBuilder.WithOrigins("https://localhost:44484")
+        .AllowCredentials()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+});
+
 app.Run();
+
+public class ChatHub : Hub
+{
+    public Task SendMessageAsync(string user, string text)
+    {
+        return Clients.All.SendAsync("Receive", user, text);
+    }
+}

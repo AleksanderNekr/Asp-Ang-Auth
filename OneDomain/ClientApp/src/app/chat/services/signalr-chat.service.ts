@@ -9,7 +9,7 @@ export class SignalrChatService {
 
   public startConnection() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7116/chat')
+      .withUrl('https://localhost:7194/chat')
       .build()
 
     this.hubConnection
