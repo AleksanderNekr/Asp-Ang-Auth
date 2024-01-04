@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using OneDomain;
 using OneDomain.Data;
 using OneDomain.Models;
+using System.Text.Json.Serialization;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,11 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddSignalR();
 builder.Services.AddCors();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
 
 WebApplication app = builder.Build();
 
