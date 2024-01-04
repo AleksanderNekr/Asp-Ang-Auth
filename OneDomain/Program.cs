@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using OneDomain;
 using OneDomain.Data;
 using OneDomain.Models;
 
@@ -57,6 +58,12 @@ app.MapRazorPages();
 app.MapFallbackToFile("index.html");
 
 app.MapHub<ChatHub>("/chat");
+
+RouteGroupBuilder chatGroup = app.MapGroup("/chat-users");
+chatGroup.MapGet("/users", (ApplicationDbContext dbContext) => dbContext.Users.AsEnumerable());
+chatGroup.MapGet("/messages", (ApplicationDbContext dbContext) => dbContext.MessageEntities
+    .Include(m => m.User)
+    .AsEnumerable());
 
 app.UseCors(policyBuilder =>
 {
