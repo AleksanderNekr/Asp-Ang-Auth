@@ -17,6 +17,6 @@ export class LoginMenuComponent implements OnInit {
 
   ngOnInit() {
     this.isAuthenticated = this.authorizeService.isAuthenticated();
-    this.userName = this.authorizeService.getUser().pipe(map(u => u && u.name));
+    this.userName = this.authorizeService.getUserName();
   }
 }

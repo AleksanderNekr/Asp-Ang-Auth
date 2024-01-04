@@ -55,6 +55,10 @@ export class AuthorizeService {
       this.userSubject.asObservable());
   }
 
+  public getUserName() {
+    return this.getUser().pipe(map(u => u && u.name));
+  }
+
   public getAccessToken(): Observable<string | null> {
     return from(this.ensureUserManagerInitialized())
       .pipe(mergeMap(() => from(this.userManager!.getUser())),
