@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using OneDomain;
 using OneDomain.Data;
@@ -74,11 +73,3 @@ app.UseCors(policyBuilder =>
 });
 
 app.Run();
-
-public class ChatHub : Hub
-{
-    public Task SendMessageAsync(string user, string text)
-    {
-        return Clients.All.SendAsync("Receive", user, text);
-    }
-}

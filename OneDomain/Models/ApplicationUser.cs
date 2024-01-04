@@ -4,5 +4,5 @@ namespace OneDomain.Models;
 
 public class ApplicationUser : IdentityUser
 {
-    public IEnumerable<Message> Messages { get; set; } = null!;
+    public IList<Message> Messages { get; set; } = new List<Message>();
 }
