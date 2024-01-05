@@ -14,6 +14,8 @@ builder.Services.AddAuthorization();
 
 WebApplication app = builder.Build();
 
+app.UseRouting();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -24,6 +26,10 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(_ => {});
+
+app.UseSpa(spaBuilder => spaBuilder.UseProxyToSpaDevelopmentServer("http://localhost:4200"));
 
 RouteGroupBuilder api = app.MapGroup("/api");
 api.MapGet("/test", () => "secret")
@@ -37,7 +43,8 @@ api.MapPost("/login", async context =>
                 new Claim[]
                 {
                     new(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
-                })),
+                },
+                authScheme)),
         new AuthenticationProperties
         {
             IsPersistent = true
