@@ -5,10 +5,13 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [ CommonModule, RouterOutlet ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
   title = 'FrontDomain';
+
+  login = () => fetch("/api/login", { method: "post" })
+  testEndpoint = () => fetch("/api/test")
 }
