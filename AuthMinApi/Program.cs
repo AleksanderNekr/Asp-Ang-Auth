@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDataProtection();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<AuthService>();
+const string? authScheme = "cookie";
+builder.Services.AddAuthentication(authScheme)
+    .AddCookie(authScheme);
 
 WebApplication app = builder.Build();
 
@@ -19,63 +19,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.Use((context, next) =>
-{
-    string? authCookie = context.Request.Headers.Cookie.FirstOrDefault(s => s is not null && s.StartsWith("auth="));
-    if (authCookie is null)
-    {
+app.UseAuthentication();
 
-        return next();
-    }
-
-    var protectionProvider = context.RequestServices.GetRequiredService<IDataProtectionProvider>();
-    string payload = authCookie.Split("=").Last();
-    payload = protectionProvider
-        .CreateProtector("auth-cookie")
-        .Unprotect(payload);
-
-    string[] parts = payload.Split(":");
-    string key = parts[0];
-    string value = parts[1];
-
-    List<Claim> claims = [new Claim(key, value)];
-    ClaimsIdentity identity = new(claims);
-    context.User = new ClaimsPrincipal(identity);
-
-    return next();
-});
-
+const string claimType = "usr";
 app.MapGet("/username", (HttpContext httpContext) =>
 {
-    return httpContext.User.FindFirstValue("usr");
+    return httpContext.User.FindFirstValue(claimType);
 });
 
-app.MapGet("/login", (AuthService authService) =>
+app.MapGet("/login", async (HttpContext httpContext) =>
 {
-    authService.SignIn();
+    List<Claim> claims = [new Claim(claimType, "alex")];
+    ClaimsIdentity identity = new(claims, authScheme);
+    var user = new ClaimsPrincipal(identity);
+
+    await httpContext.SignInAsync(authScheme, user);
     return "ok";
 });
 
 app.Run();
-
-internal class AuthService
-{
-    private readonly IDataProtectionProvider _protectionProvider;
-    private readonly IHttpContextAccessor _contextAccessor;
-    public AuthService(IDataProtectionProvider protectionProvider, IHttpContextAccessor contextAccessor)
-    {
-        _protectionProvider = protectionProvider;
-        _contextAccessor = contextAccessor;
-    }
-
-    public void SignIn()
-    {
-        IDataProtector protector = _protectionProvider.CreateProtector("auth-cookie");
-        if (_contextAccessor.HttpContext is not null)
-        {
-            _contextAccessor.HttpContext.Response.Headers.SetCookie = $"auth={protector.Protect("usr:alex")}";
-        }
-
-
-    }
-}
