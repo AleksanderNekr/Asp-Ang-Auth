@@ -11,6 +11,16 @@ builder.Services.AddAuthentication(authScheme)
     .AddCookie(authScheme)
     .AddCookie(authScheme2);
 
+const string policyName = "eu passport";
+builder.Services
+    .AddAuthorizationBuilder()
+    .AddPolicy(policyName, policyBuilder =>
+    {
+        policyBuilder.RequireAuthenticatedUser()
+            .AddAuthenticationSchemes(authScheme)
+            .RequireClaim("passport_type", "eur");
+    });
+
 WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -22,66 +32,20 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-
-app.Use((context, next) =>
-{
-    if (context.Request.Path.StartsWithSegments("/login"))
-    {
-        return next();
-    }
-    
-    if (context.User.Identities.All(id => id.AuthenticationType != authScheme))
-    {
-        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        return Task.CompletedTask;
-    }
-    
-    if (!context.User.HasClaim("passport_type", "eur"))
-    {
-        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-        return Task.CompletedTask;
-    }
-
-    return next();
-});
+app.UseAuthorization();
 
 const string userClaimType = "usr";
 app.MapGet("/unsecure", (HttpContext httpContext) => httpContext.User.FindFirstValue(userClaimType) ?? "empty");
 
-// [AuthScheme(authScheme2)]
 app.MapGet("/denmark", (HttpContext httpContext) =>
 {
-    // if (httpContext.User.Identities.All(id => id.AuthenticationType != authScheme2))
-    // {
-    //     httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-    //     return string.Empty;
-    // }
-    //
-    // if (!httpContext.User.HasClaim("passport_type", "eur"))
-    // {
-    //     httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-    //     return string.Empty;
-    // }
-
     return "allowed";
 });
 
 app.MapGet("/norway", (HttpContext httpContext) =>
 {
-    // if (httpContext.User.Identities.All(id => id.AuthenticationType != authScheme))
-    // {
-    //     httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
-    //     return string.Empty;
-    // }
-    //
-    // if (!httpContext.User.HasClaim("passport_type", "NOR"))
-    // {
-    //     httpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
-    //     return string.Empty;
-    // }
-
     return "allowed";
-});
+}).RequireAuthorization(policyName);
 
 app.MapGet("/login", async (HttpContext httpContext) =>
 {
@@ -95,6 +59,6 @@ app.MapGet("/login", async (HttpContext httpContext) =>
 
     await httpContext.SignInAsync(authScheme, user);
     return "ok";
-});
+}).AllowAnonymous();
 
 app.Run();
