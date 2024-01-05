@@ -11,4 +11,7 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AppComponent {
   title = 'SsrClient';
+
+  login = () => fetch("https://localhost:7056/api/login", { method: "post", credentials: "include" });
+  testEndpoints = () => fetch("https://localhost:7056/api/test", { method: "get", credentials: "include" });
 }

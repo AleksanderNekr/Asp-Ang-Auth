@@ -67,7 +67,9 @@
           "options": {
             "ssl": true,
             "sslKey": "localhost-key.pem",
-            "sslCert": "localhost.pem"
+            "sslCert": "localhost.pem",
+            "host": "0.0.0.0",
+            "proxyConfig": "src/proxy.conf.json"
           }
         },
         "extract-i18n": {
