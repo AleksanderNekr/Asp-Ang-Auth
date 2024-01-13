@@ -1,4 +1,6 @@
+using AuthSchemas;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Json;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
@@ -8,8 +10,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication()
-    .AddCookie("local");
-builder.Services.AddAuthorization();
+    .AddCookie("local")
+    .AddScheme<CookieAuthenticationOptions, VisitorAuthHandler>("visitor", _ => {});
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("customer", policyBuilder =>
+    {
+        policyBuilder.AddAuthenticationSchemes("local", "visitor")
+            .RequireAuthenticatedUser();
+    });
 
 builder.Services.Configure<JsonOptions>(options => options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
@@ -25,7 +33,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapGet("/", GetDefault)
-    .Produces<string>();
+    .Produces<string>()
+    .RequireAuthorization("customer");
 
 app.MapGet("/login-local", LoginLocal)
     .Produces(200)
