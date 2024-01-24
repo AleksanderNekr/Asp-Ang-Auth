@@ -1,13 +1,16 @@
 using AuthSchemas;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.Json;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using JsonOptions = Microsoft.AspNetCore.Http.Json.JsonOptions;
+
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHttpClient();
 
 builder.Services.AddAuthentication()
     .AddCookie("local")
@@ -28,7 +31,8 @@ builder.Services.AddAuthentication()
 
         options.CallbackPath = "/oauth-cb-patreon";
         options.SignInScheme = "patreon-cookie";
-    });
+    }).AddCookie("lichess-cookie")
+       .AddOAuth<LichessOAuthOptions, LichessOAuthHandler>("lichess-oauth", _ => {});
 
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("customer", policyBuilder =>
@@ -40,6 +44,11 @@ builder.Services.AddAuthorizationBuilder()
     {
         policyBuilder.AddAuthenticationSchemes("local")
             .RequireAuthenticatedUser();
+    })
+    .AddPolicy("lichess-user", policyBuilder =>
+    {
+      policyBuilder.AddAuthenticationSchemes("lichess-oauth")
+                   .RequireAuthenticatedUser();
     });
 
 builder.Services.Configure<JsonOptions>(options => options.SerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
@@ -68,6 +77,11 @@ app.MapGet("/login-patreon", LoginPatreon)
     .Produces(400)
     .RequireAuthorization("user");
 
+app.MapGet("/login-lichess", LoginLichess);
+
+app.MapGet("/lichess-info", LichessUserInfo)
+   .RequireAuthorization("lichess-user");
+
 app.UseHttpsRedirection();
 
 app.Run();
@@ -94,4 +108,14 @@ IResult LoginLocal(HttpContext context)
 IResult LoginPatreon(HttpContext context)
 {
     return Results.Challenge(new AuthenticationProperties { RedirectUri = "/" }, [ "external-patreon" ]);
+}
+
+IResult LoginLichess(HttpContext context)
+{
+    return Results.Challenge(new AuthenticationProperties { RedirectUri = "/" }, [ "lichess-oauth" ]);
+}
+
+IResult LichessUserInfo(HttpContext context)
+{
+    return Results.Ok(context.User.Identities);
 }
