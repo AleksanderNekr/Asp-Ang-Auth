@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AuthMinApi", "AuthMinApi", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityManagement", "AuthMinApi\IdentityManagement\IdentityManagement.csproj", "{93AE56AB-29C6-4539-95B9-EC1D332237BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthScemas", "AuthMinApi\AuthScemas\AuthScemas.csproj", "{7DAEB61B-CD06-4909-9167-78D1442990CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthSchemas", "AuthMinApi\AuthSchemas\AuthSchemas.csproj", "{7DAEB61B-CD06-4909-9167-78D1442990CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthDefault", "AuthMinApi\AuthDefault\AuthDefault.csproj", "{E3D22E1C-70C7-4E26-9491-66DA00803965}"
 EndProject

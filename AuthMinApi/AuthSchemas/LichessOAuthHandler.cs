@@ -83,7 +83,7 @@ public class LichessOAuthHandler(
             return AuthenticateResult.NoResult();
         }
 
-        logger.LogInformation("Auth succeded");
+        logger.LogInformation("Auth succeeded");
 
         return AuthenticateResult.Success(new AuthenticationTicket(ticket.Principal,
                                                                    ticket.Properties,
